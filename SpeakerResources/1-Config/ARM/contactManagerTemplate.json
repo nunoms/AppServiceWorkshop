@@ -1,0 +1,226 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "skuName": {
+      "type": "string",
+      "defaultValue": "S1",
+      "allowedValues": [
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "Describes plan's pricing tier and instance size. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "skuCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "minValue": 1,
+      "metadata": {
+        "description": "Describes plan's instance count"
+      }
+    },
+    "sqlAdministratorLogin": {
+      "type": "string",
+      "metadata": {
+        "description": "The admin user of the SQL Server"
+      }
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The password of the admin user of the SQL Server"
+      }
+    },
+    "StorageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "siteName": {
+      "type": "string",
+      "minLength" : 5
+     }
+  },
+  "variables": {
+    "hostingPlanName": "[concat(parameters('siteName'),'-hostingplan')]",
+    "sqlserverName": "[concat(uniqueString(resourceGroup().id),'dbserver')]",
+    "databaseName": "ContactManager_db",
+    "StorageAccountName": "[concat('storage',uniqueString(resourceGroup().id))]"
+  },
+  "resources": [
+    {
+      "name": "[variables('sqlserverName')]",
+      "type": "Microsoft.Sql/servers",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "SqlServer"
+      },
+      "apiVersion": "2014-04-01",
+      "properties": {
+        "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+        "version": "12.0"
+      },
+      "resources": [
+        {
+          "name": "[variables('databaseName')]",
+          "type": "databases",
+          "location": "[resourceGroup().location]",
+          "tags": {
+            "displayName": "Database"
+          },
+          "apiVersion": "2015-01-01",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
+          "properties": {
+            "edition": "Basic",
+            "collation": "SQL_Latin1_General_CP1_CI_AS",
+            "maxSizeBytes": "1073741824",
+            "requestedServiceObjectiveName": "Basic"
+          }
+        },
+        {
+          "type": "firewallrules",
+          "apiVersion": "2014-04-01",
+          "dependsOn": [
+            "[variables('sqlserverName')]"
+          ],
+          "location": "[resourceGroup().location]",
+          "name": "AllowAllWindowsAzureIps",
+          "properties": {
+            "endIpAddress": "0.0.0.0",
+            "startIpAddress": "0.0.0.0"
+          }
+        }
+      ]
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[variables('hostingPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "HostingPlan"
+      },
+      "sku": {
+        "name": "[parameters('skuName')]",
+        "capacity": "[parameters('skuCapacity')]"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]"
+      }
+    },
+    {
+      "apiVersion": "2016-03-01",
+      "name": "[parameters('siteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('hostingPlanName')]"
+      ],
+      "tags": {
+        "[concat('hidden-related:', resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName')))]": "empty",
+        "displayName": "Website"
+      },
+      "properties": {
+        "name": "[parameters('siteName')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      },
+      "resources": [
+         {
+          "apiVersion": "2015-08-01",
+          "name": "appsettings",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": {
+            "AppSettingKey1": "Some value",
+            "AppSettingKey2": "My second setting",
+            "AppSettingKey3": "My third setting"
+          }
+        },
+        {
+          "apiVersion": "2016-03-01",
+          "type": "config",
+          "name": "connectionstrings",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]",
+            "[concat('Microsoft.Web/Sites/', parameters('siteName'), '/Extensions/MSDeploy')]"
+          ],
+          "properties": {
+            "ContactManagerDb": {
+              "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('databaseName'), ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]",
+              "type": "SQLAzure"
+            },
+             "ContactManagerDb_DatabasePublish": {
+              "value": "[concat('Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('databaseName'), ';User Id=', parameters('sqlAdministratorLogin'), '@', reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName, ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]",
+              "type": "SQLAzure"
+            }
+          }
+        },
+        {
+          "apiVersion": "2014-06-01",
+          "type": "extensions",
+          "name": "MSDeploy",
+        "dependsOn": [
+            "[parameters('siteName')]"
+        ],
+        "properties": {
+             "packageUri": "https://nunosazurestorage.blob.core.windows.net/webdeploypackages/ContactManager.zip"
+          }
+        }
+      ]
+    },
+      {
+          "name": "[variables('StorageAccountName')]",
+          "type": "Microsoft.Storage/storageAccounts",
+          "location": "[resourceGroup().location]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [ ],
+          "tags": {
+              "displayName": "StorageAccount"
+          },
+          "properties": {
+              "accountType": "[parameters('StorageAccountType')]"
+          }
+      }
+  ],
+  "outputs": {
+    "siteUri": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.Web/sites/', parameters('siteName'))).hostnames[0]]"
+    },
+    "sqlSvrFqdn": {
+      "type": "string",
+      "value": "[reference(concat('Microsoft.Sql/servers/', variables('sqlserverName'))).fullyQualifiedDomainName]"
+    },
+    "storageAccountName": {
+        "type": "string",
+        "value": "[variables('StorageAccountName')]"
+      },
+      "resourceGroupName": {
+        "type": "string",
+        "value": "[resourceGroup().Name]"
+      },
+      "webSiteName": {
+        "type": "string",
+        "value": "[parameters('siteName')]"
+      }
+    }
+  }
+
