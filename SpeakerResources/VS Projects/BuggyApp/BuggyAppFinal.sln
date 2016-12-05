@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuggyAppFinal", "BuggyAppFinal\BuggyAppFinal.csproj", "{3C31810F-BE46-4ADE-A047-4D7D24F6AB7F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BuggyAPI", "BuggyAPI\BuggyAPI.csproj", "{67333615-710E-46FE-B945-C94CC3A60C7B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C31810F-BE46-4ADE-A047-4D7D24F6AB7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C31810F-BE46-4ADE-A047-4D7D24F6AB7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C31810F-BE46-4ADE-A047-4D7D24F6AB7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C31810F-BE46-4ADE-A047-4D7D24F6AB7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67333615-710E-46FE-B945-C94CC3A60C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67333615-710E-46FE-B945-C94CC3A60C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67333615-710E-46FE-B945-C94CC3A60C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67333615-710E-46FE-B945-C94CC3A60C7B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
