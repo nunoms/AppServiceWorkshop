@@ -1,0 +1,121 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "prefix": {
+            "type": "string",
+            "minLength": 3
+        }
+    },
+    "resources": [
+        {
+            "name": "[variables('deployDemos-PlanName')]",
+            "type": "Microsoft.Web/serverfarms",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2014-06-01",
+            "dependsOn": [],
+            "tags": {
+                "displayName": "deployDemos-Plan"
+            },
+            "properties": {
+                "name": "[variables('deployDemos-PlanName')]",
+                "sku": "Standard",
+                "workerSize": "Small",
+                "numberOfWorkers": 1
+            }
+        },
+        {
+            "name": "[variables('VSAppName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            ],
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]": "Resource",
+                "displayName": "VSApp"
+            },
+            "properties": {
+                "name": "[variables('VSAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            }
+        },
+        {
+            "name": "[variables('FTPAppName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            ],
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]": "Resource",
+                "displayName": "FTPApp"
+            },
+            "properties": {
+                "name": "[variables('FTPAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            }
+        },
+        {
+            "name": "[variables('VSTSAppName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            ],
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]": "Resource",
+                "displayName": "VSTSApp"
+            },
+            "properties": {
+                "name": "[variables('VSTSAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            }
+        },
+         {
+            "name": "[variables('GitAppName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            ],
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]": "Resource",
+                "displayName": "GitAppName"
+            },
+            "properties": {
+                "name": "[variables('GitAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            }
+        },
+             {
+            "name": "[variables('GitHubAppName')]",
+            "type": "Microsoft.Web/sites",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "2015-08-01",
+            "dependsOn": [
+                "[concat('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            ],
+            "tags": {
+                "[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]": "Resource",
+                "displayName": "GitAppName"
+            },
+            "properties": {
+                "name": "[variables('GitAppName')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', variables('deployDemos-PlanName'))]"
+            }
+        }    
+    ],
+    "variables": {
+        "VSAppName": "[concat(parameters('prefix'),'-VS-App')]",
+        "GitHubAppName": "[concat(parameters('prefix'),'-GitHub-App')]",
+        "FTPAppName": "[concat(parameters('prefix'),'-FTP-App')]",
+        "VSTSAppName": "[concat(parameters('prefix'),'-VSTS-App')]",
+         "GitAppName": "[concat(parameters('prefix'),'-Git-App')]",
+        "deployDemos-PlanName":"[concat(parameters('prefix'),'-DeployDemos-Plan')]"
+    }
+}

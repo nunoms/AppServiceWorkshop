@@ -1,0 +1,26 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "resources": [
+    {
+      "apiVersion": "2015-08-01",
+      "name": "DemoAppServicePlan",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "West US",
+      "sku": {
+        "name": "F1",
+        "tier": "Free"
+      }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "DemoApp",
+      "type": "Microsoft.Web/sites",
+      "location": "West US",
+      "dependsOn": [ "DemoAppServicePlan" ],
+      "properties": {
+        "serverFarmId": "DemoAppServicePlan"
+      }
+    }
+  ]
+}

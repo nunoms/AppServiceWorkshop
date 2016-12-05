@@ -1,0 +1,82 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+
+    "siteName": {
+      "type": "string"
+    },
+
+    "hostingPlanName": {
+      "type": "string"
+    },
+
+    "sku": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Shared"
+      ],
+      "defaultValue": "Free"
+    }
+  },
+
+  "resources": [
+    {
+      "apiVersion": "2014-11-01",
+      "name": "[parameters('hostingPlanName')]",
+      "type": "Microsoft.Web/serverFarms",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[parameters('hostingPlanName')]",
+        "sku": "[parameters('sku')]"
+       }
+    },
+    {
+      "apiVersion": "2015-08-01",
+      "name": "[parameters('siteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[parameters('hostingPlanName')]" 
+        ],
+      "properties": {
+        "serverFarmId": "[parameters('hostingPlanName')]"
+      },
+     "resources": [
+         {
+            "apiVersion": "2015-08-01",
+            "name": "appsettings",
+            "type": "config",
+            "dependsOn": [
+              "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+            ],
+            "properties": {
+              "AppSettingKey1": "Some value",
+              "AppSettingKey2": "My second setting",
+              "AppSettingKey3": "My third setting"
+            }
+          },
+          {
+            "apiVersion": "2015-08-01",
+            "name": "web",
+            "type": "config",
+            "dependsOn": [
+              "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+            ],
+            "properties": {
+              "phpVersion": "5.5",
+              "use32BitWorkerProcess": false,
+              "webSocketsEnabled": true,
+              "alwaysOn": true,
+
+              "defaultDocuments": [
+                  "index.html",
+                 "hostingstart.html"
+              ]
+            }
+          }
+        ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+Git Origin Repo: https://github.com/Azure-Samples/app-service-web-dotnet-get-started.git
+
+#make sure you are running this in the correct directory
+
+git clone https://github.com/Azure-Samples/app-service-web-dotnet-get-started.git
+
+cd app-service-web-html-get-started
+
+#Now you need to create a webapp in azure, set Deployment Options to Local GIT repository and then copy the git repo url (from the overview tab)
+
+git remote add azure <git-repo-url>
+
+git push azure
+
+#open the folder in VS code and edit the index.html file
+git add .
+git commit -m "changed homepage"
+git push azure
+
