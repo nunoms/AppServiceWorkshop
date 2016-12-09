@@ -154,6 +154,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="Properties\PublishProfiles\mybuggywebsite - Web Deploy %282%29.pubxml" />
+    <None Include="Properties\PublishProfiles\mybuggywebsite - Web Deploy %283%29.pubxml" />
     <None Include="Properties\PublishProfiles\mybuggywebsite - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\mybuggywebsite-Staging - Web Deploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -275,7 +276,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BuggyAPI\BuggyAPI.csproj">
-      <Project>{67333615-710e-46fe-b945-c94cc3a60c7b}</Project>
+      <Project>{31cc122f-f9f1-4e83-98eb-aa4efc3c2436}</Project>
       <Name>BuggyAPI</Name>
     </ProjectReference>
   </ItemGroup>
